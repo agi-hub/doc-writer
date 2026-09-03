@@ -65,7 +65,7 @@ doc-writer/
 ## 典型端到端流程
 
 ```mermaid
-graph LR
+graph TD
     A[明确需求/选功能] --> B[调研: 网页/知识库/代码库]
     B --> C[拟大纲]
     C --> D[逐章写作: 先绘足图<br/>SVG+mermaid+数据图]
