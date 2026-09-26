@@ -7,8 +7,10 @@
 ```
 doc-writer/
 ├── SKILL.md        # 模式路由 + 通用写作规范（§1–§4）
-└── modes/          # 23 个功能文件，逐文件注明出处
-```
+├── modes/          # 23 个功能文件，逐文件注明出处
+└── tools/          # md → Word 转换工具（node，无需 python）
+    ├── md2docx.js            # pandoc 封装：公式归一/去水平线/网图下载/media 校验，支持 --toc --title 等
+    └── word_reference.docx   # 内置中文 Word 模板（黑体标题、宋体正文），源自 paper2doc
 
 ## 功能总览
 

@@ -125,7 +125,17 @@ doc-writer/
 
 # 3. 转换文档
 - 默认采用Markdown书写
-- 编辑完成后，请通过pandoc转换文档到word或pdf
+- **优先用本 skill 自带转换工具**（node 实现，无需 python；自动套用内置中文模板）：
+
+  ```bash
+  node <skill目录>/tools/md2docx.js article.md                # 输出同名 .docx（套 tools/word_reference.docx 模板）
+  node <skill目录>/tools/md2docx.js report.md -o 报告.docx --toc --title "题目" --author "作者" --date "2026-09"
+  ```
+
+  - 模板为中文 Word 样式（黑体标题、宋体正文、标题样式名 heading 1..4，pandoc 按名匹配直接生效）；`--reference none` 禁用、`--reference my.docx` 换用其他模板。
+  - 自动预处理：`\[..\]`/`\(..\)` 公式分隔符归一、删除水平分隔线、下载网络图片到 `assets_md2docx/`、校验本地图片存在；转换后自动核对 docx `word/media/` 数与图片引用数是否一致。
+  - 依赖：系统 pandoc + node ≥ 18。本工具为 paper2doc（https://github.com/agi-hub/paper2doc）md2docx.py 的 node 移植。
+  - 注：`markdown+hard_line_breaks` 下软换行会变硬换行，段落请写成单行（或先合并）。
 
 ### 3.1 pandoc 转 Word 的常见坑（实战经验，转换前逐条自查）
 
@@ -133,7 +143,8 @@ doc-writer/
 2. **```svg 代码块不会进 Word**：pandoc 无法渲染 fenced svg，会以代码文本形式出现在文档里。必须先把 SVG 存成 `.svg` 文件渲染为 PNG（浏览器无头截图 `deviceScaleFactor:2` 或 rsvg-convert），再把正文中的代码块替换为 `![](images/xxx.png)` 引用；转换后检查 docx 的 `word/media/` 数量、正文无 `&lt;svg` 残留。
 3. **HTML 注释图注会被丢弃**：`<!-- ... -->` 形式的图题在 Word 中不可见。若需要读者可见的图注，写成正文斜体行（`*图 3-1　……*`）紧跟图片之后。
 4. **占位式引用要全文归一**：写作期常用 `[Lamina]`、`[Step3;AP]` 这类作者/系统名缩写占位引用，交付前必须统一替换为数字序号；注意**多键合并括号**（`[A;B]`）不会被单键替换覆盖，需用正则全量扫描 `[大写字母开头的键(;键)*]` 形态，替换后确认正文中占位引用为 0、数字引用与参考文献条目一一对应。
-5. **输出文件被占用**：目标 docx 若正被 Word 打开会写入失败，且工具读取 pandoc 的 GBK 错误输出可能崩溃、报出误导性的解码错误。换一个输出文件名即可定位真因；交付前提醒用户关闭旧文档。
+5. **图片 alt 文本会变成可见图注**：pandoc 的 implicit_figures 会把独立成段的 `![alt](img)` 的 alt 文本渲染为图片下方 "Image Caption" 样式段落。若正文已有 `*图 N-M　题注*` 行会造成**双重图注**（实战：alt 误填序号后出现两行数字图注）。对策：alt 留空 `![](img)`，只用斜体图注行；或刻意只用 alt 做图注、不再手写图注行——二选一。
+6. **输出文件被占用**：目标 docx 若正被 Word 打开会写入失败，且工具读取 pandoc 的 GBK 错误输出可能崩溃、报出误导性的解码错误。换一个输出文件名即可定位真因；交付前提醒用户关闭旧文档。
 
 ### 3.2 从论文 PDF 取原文配图
 
